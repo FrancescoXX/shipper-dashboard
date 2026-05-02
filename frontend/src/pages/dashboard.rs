@@ -1,5 +1,5 @@
 use crate::{
-    api::client::{fetch_revenue, fetch_stats},
+    api::client::{fetch_batch_summary, fetch_revenue, fetch_stats},
     components::{simple_chart::SimpleChart, stat_card::StatCard},
 };
 use leptos::*;
@@ -8,6 +8,7 @@ use leptos::*;
 pub fn DashboardPage() -> impl IntoView {
     let stats = create_resource(|| (), |_| async { fetch_stats().await });
     let revenue = create_resource(|| (), |_| async { fetch_revenue().await });
+    let batch = create_resource(|| (), |_| async { fetch_batch_summary().await });
     let (dark_mode, set_dark_mode) = create_signal(true);
 
     view! {
@@ -35,14 +36,41 @@ pub fn DashboardPage() -> impl IntoView {
                         <h1 class="m-0 max-w-[900px] text-[clamp(2.45rem,6vw,6.4rem)] font-black leading-[0.88] tracking-normal">"The place that sharpens your taste."</h1>
                     </div>
                     <div class="flex shrink-0 items-center gap-2.5 max-sm:w-full max-sm:justify-between">
-                        <a
-                            class="inline-flex min-h-9 items-center justify-center whitespace-nowrap rounded-full border border-red-400 bg-shipper-red px-4 text-[0.82rem] font-extrabold text-white shadow-[0_14px_34px_rgb(225_29_29_/_0.26)] hover:bg-red-500"
-                            href="https://www.shipper.club/"
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            "Claim your spot"
-                        </a>
+                        <Suspense fallback=move || view! {
+                            <a
+                                class="inline-flex min-h-9 items-center justify-center whitespace-nowrap rounded-full border border-red-400 bg-shipper-red px-4 text-[0.82rem] font-extrabold text-white shadow-[0_14px_34px_rgb(225_29_29_/_0.26)] hover:bg-red-500"
+                                href="https://www.shipper.club/"
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                "Claim your spot"
+                            </a>
+                        }>
+                            {move || {
+                                batch.get().map(|result| match result {
+                                    Ok(b) => view! {
+                                        <a
+                                            class="inline-flex min-h-9 items-center justify-center whitespace-nowrap rounded-full border border-red-400 bg-shipper-red px-4 text-[0.82rem] font-extrabold text-white shadow-[0_14px_34px_rgb(225_29_29_/_0.26)] hover:bg-red-500"
+                                            href={b.cta_url.clone()}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            "Claim your spot"
+                                        </a>
+                                    }.into_view(),
+                                    Err(_) => view! {
+                                        <a
+                                            class="inline-flex min-h-9 items-center justify-center whitespace-nowrap rounded-full border border-red-400 bg-shipper-red px-4 text-[0.82rem] font-extrabold text-white shadow-[0_14px_34px_rgb(225_29_29_/_0.26)] hover:bg-red-500"
+                                            href="https://www.shipper.club/"
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            "Claim your spot"
+                                        </a>
+                                    }.into_view(),
+                                })
+                            }}
+                        </Suspense>
                         <div class="flex rounded-full border border-zinc-200 bg-white/80 p-1 dark:border-zinc-800 dark:bg-zinc-950/80" role="group" aria-label="Theme">
                             <button
                                 type="button"
@@ -75,26 +103,49 @@ pub fn DashboardPage() -> impl IntoView {
                     </div>
                 </header>
 
-                <div class="mb-3.5 grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-lg bg-zinc-950 p-5 text-white shadow-[0_18px_60px_rgb(10_10_10_/_0.12)] dark:bg-white dark:text-black dark:shadow-[0_22px_70px_rgb(0_0_0_/_0.44)] max-lg:grid-cols-1 max-lg:items-start">
-                    <div>
-                        <p class="m-0 mb-1 text-[0.88rem] font-bold text-white/70 dark:text-black/65">"Current batch - become a Legend"</p>
-                        <span class="text-[0.88rem] font-bold text-white/70 dark:text-black/65">"Batch 2 of 10 · 16/100 claimed"</span>
+                <Suspense fallback=move || view! {
+                    <div class="mb-3.5 grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-lg bg-zinc-950 p-5 text-white shadow-[0_18px_60px_rgb(10_10_10_/_0.12)] dark:bg-white dark:text-black dark:shadow-[0_22px_70px_rgb(0_0_0_/_0.44)] max-lg:grid-cols-1 max-lg:items-start">
+                        <p class="m-0 text-[0.88rem] font-bold text-white/70 dark:text-black/65">"Loading batch info…"</p>
                     </div>
-                    <strong class="text-[clamp(1.2rem,3vw,2.35rem)] font-black uppercase leading-none tracking-normal">"84 spots left"</strong>
-                    <div class="flex items-center gap-2.5 rounded-full border border-white/25 py-1.5 pl-1.5 pr-3 dark:border-black/20">
-                        <img
-                            class="block h-[42px] w-[42px] rounded-full border border-white/45 object-cover dark:border-black/35"
-                            src="https://www.shipper.club/builders/orcdev.jpeg"
-                            alt="OrcDev avatar"
-                            width="42"
-                            height="42"
-                        />
-                        <div class="grid gap-px">
-                            <span class="text-[0.68rem] font-bold uppercase text-white/70 dark:text-black/60">"Founded by"</span>
-                            <b class="text-[0.92rem] leading-none">"OrcDev"</b>
-                        </div>
-                    </div>
-                </div>
+                }>
+                    {move || {
+                        batch.get().map(|result| match result {
+                            Ok(b) => view! {
+                                <div class="mb-3.5 grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-lg bg-zinc-950 p-5 text-white shadow-[0_18px_60px_rgb(10_10_10_/_0.12)] dark:bg-white dark:text-black dark:shadow-[0_22px_70px_rgb(0_0_0_/_0.44)] max-lg:grid-cols-1 max-lg:items-start">
+                                    <div>
+                                        <p class="m-0 mb-1 text-[0.88rem] font-bold text-white/70 dark:text-black/65">
+                                            {format!("Current batch - become a {}", b.tier_name)}
+                                        </p>
+                                        <span class="text-[0.88rem] font-bold text-white/70 dark:text-black/65">
+                                            {format!("Batch {} of {} · {}/{} claimed", b.batch_number, b.total_batches, b.claimed_spots, b.total_spots)}
+                                        </span>
+                                    </div>
+                                    <strong class="text-[clamp(1.2rem,3vw,2.35rem)] font-black uppercase leading-none tracking-normal">
+                                        {format!("{} spots left", b.spots_left)}
+                                    </strong>
+                                    <div class="flex items-center gap-2.5 rounded-full border border-white/25 py-1.5 pl-1.5 pr-3 dark:border-black/20">
+                                        <img
+                                            class="block h-[42px] w-[42px] rounded-full border border-white/45 object-cover dark:border-black/35"
+                                            src={b.founder_avatar_url.clone()}
+                                            alt={format!("{} avatar", b.founder_name)}
+                                            width="42"
+                                            height="42"
+                                        />
+                                        <div class="grid gap-px">
+                                            <span class="text-[0.68rem] font-bold uppercase text-white/70 dark:text-black/60">"Founded by"</span>
+                                            <b class="text-[0.92rem] leading-none">{b.founder_name.clone()}</b>
+                                        </div>
+                                    </div>
+                                </div>
+                            }.into_view(),
+                            Err(error) => view! {
+                                <div class="mb-3.5 rounded-lg border border-red-400/30 bg-red-950/20 p-5">
+                                    <p class="m-0 text-[0.88rem] font-bold text-red-400">{format!("Failed to load batch info: {error}")}</p>
+                                </div>
+                            }.into_view(),
+                        })
+                    }}
+                </Suspense>
 
                 <Suspense fallback=move || view! { <p class="text-zinc-500 dark:text-zinc-400">"Loading dashboard..."</p> }>
                     {move || {
