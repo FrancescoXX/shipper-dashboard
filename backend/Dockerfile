@@ -4,6 +4,7 @@ WORKDIR /app
 COPY Cargo.toml ./
 COPY backend ./backend
 COPY frontend ./frontend
+COPY migrations ./migrations
 COPY shared ./shared
 
 RUN cargo build --release -p backend
