@@ -8,7 +8,8 @@ use leptos::*;
 pub fn DashboardPage() -> impl IntoView {
     let stats = create_resource(|| (), |_| async { fetch_stats().await });
     let revenue = create_resource(|| (), |_| async { fetch_revenue().await });
-    let (dark_mode, set_dark_mode) = create_signal(true);
+    let initial_dark = get_theme_preference().map(|v| v != "light").unwrap_or(true);
+    let (dark_mode, set_dark_mode) = create_signal(initial_dark);
 
     view! {
         <style>{include_str!("../styles.css")}</style>
@@ -53,7 +54,10 @@ pub fn DashboardPage() -> impl IntoView {
                                         "min-w-14 cursor-pointer rounded-full bg-zinc-950 px-2.5 py-1.5 text-[0.8rem] font-bold text-white"
                                     }
                                 }
-                                on:click=move |_| set_dark_mode.set(false)
+                                on:click=move |_| {
+                                    set_dark_mode.set(false);
+                                    set_theme_preference("light");
+                                }
                             >
                                 "Light"
                             </button>
@@ -66,7 +70,10 @@ pub fn DashboardPage() -> impl IntoView {
                                         "min-w-14 cursor-pointer rounded-full px-2.5 py-1.5 text-[0.8rem] font-bold text-zinc-500"
                                     }
                                 }
-                                on:click=move |_| set_dark_mode.set(true)
+                                on:click=move |_| {
+                                    set_dark_mode.set(true);
+                                    set_theme_preference("dark");
+                                }
                             >
                                 "Dark"
                             </button>
@@ -137,4 +144,13 @@ pub fn DashboardPage() -> impl IntoView {
 
 fn format_cents(cents: i64) -> String {
     format!("${:.2}", cents as f64 / 100.0)
+}
+
+fn get_theme_preference() -> Option<String> {
+    let val = js_sys::eval("localStorage.getItem('shipper-theme')").ok()?;
+    val.as_string()
+}
+
+fn set_theme_preference(theme: &str) {
+    let _ = js_sys::eval(&format!("localStorage.setItem('shipper-theme','{theme}')"));
 }
