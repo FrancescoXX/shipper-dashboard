@@ -1,9 +1,13 @@
 #[cfg(test)]
 mod tests {
     use crate::{app, db::pool::create_pool, state::AppState};
-    use axum::http::{Request, StatusCode};
+    use axum::{
+        extract::ConnectInfo,
+        http::{Request, StatusCode},
+    };
     use http_body_util::BodyExt;
     use shared::{DashboardStats, RevenuePoint};
+    use std::net::SocketAddr;
     use tower::ServiceExt;
 
     async fn test_app() -> axum::Router {
@@ -21,6 +25,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .uri(uri)
+                    .extension(ConnectInfo(SocketAddr::from(([127, 0, 0, 1], 3000))))
                     .body(axum::body::Body::empty())
                     .unwrap(),
             )
@@ -34,7 +39,7 @@ mod tests {
     #[tokio::test]
     async fn health_returns_ok() {
         let app = test_app().await;
-        let (status, body) = get_body(app, "/health").await;
+        let (status, body) = get_body(app, "/api/health").await;
         assert_eq!(status, StatusCode::OK);
         let json: serde_json::Value = serde_json::from_slice(&body).unwrap();
         assert_eq!(json["status"], "ok");
