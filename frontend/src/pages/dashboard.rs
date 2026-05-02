@@ -40,6 +40,7 @@ pub fn DashboardPage() -> impl IntoView {
                             href="https://www.shipper.club/"
                             target="_blank"
                             rel="noreferrer"
+                            aria-label="Claim your spot at Shipper Club"
                         >
                             "Claim your spot"
                         </a>
@@ -53,6 +54,7 @@ pub fn DashboardPage() -> impl IntoView {
                                         "min-w-14 cursor-pointer rounded-full bg-zinc-950 px-2.5 py-1.5 text-[0.8rem] font-bold text-white"
                                     }
                                 }
+                                aria-pressed=move || if dark_mode.get() { "false" } else { "true" }
                                 on:click=move |_| set_dark_mode.set(false)
                             >
                                 "Light"
@@ -66,6 +68,7 @@ pub fn DashboardPage() -> impl IntoView {
                                         "min-w-14 cursor-pointer rounded-full px-2.5 py-1.5 text-[0.8rem] font-bold text-zinc-500"
                                     }
                                 }
+                                aria-pressed=move || if dark_mode.get() { "true" } else { "false" }
                                 on:click=move |_| set_dark_mode.set(true)
                             >
                                 "Dark"
@@ -75,7 +78,7 @@ pub fn DashboardPage() -> impl IntoView {
                     </div>
                 </header>
 
-                <div class="mb-3.5 grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-lg bg-zinc-950 p-5 text-white shadow-[0_18px_60px_rgb(10_10_10_/_0.12)] dark:bg-white dark:text-black dark:shadow-[0_22px_70px_rgb(0_0_0_/_0.44)] max-lg:grid-cols-1 max-lg:items-start">
+                <div class="mb-3.5 grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-lg bg-zinc-950 p-5 text-white shadow-[0_18px_60px_rgb(10_10_10_/_0.12)] dark:bg-white dark:text-black dark:shadow-[0_22px_70px_rgb(0_0_0_/_0.44)] max-lg:grid-cols-1 max-lg:items-start" role="region" aria-label="Current batch summary">
                     <div>
                         <p class="m-0 mb-1 text-[0.88rem] font-bold text-white/70 dark:text-black/65">"Current batch - become a Legend"</p>
                         <span class="text-[0.88rem] font-bold text-white/70 dark:text-black/65">"Batch 2 of 10 · 16/100 claimed"</span>
@@ -96,7 +99,8 @@ pub fn DashboardPage() -> impl IntoView {
                     </div>
                 </div>
 
-                <Suspense fallback=move || view! { <p class="text-zinc-500 dark:text-zinc-400">"Loading dashboard..."</p> }>
+                <div aria-live="polite">
+                <Suspense fallback=move || view! { <p class="text-zinc-500 dark:text-zinc-400">{"Loading dashboard..."}</p> }>
                     {move || {
                         stats.get().map(|result| match result {
                             Ok(stats) => view! {
@@ -112,8 +116,9 @@ pub fn DashboardPage() -> impl IntoView {
                         })
                     }}
                 </Suspense>
+                </div>
 
-                <section class="rounded-lg border border-zinc-200 bg-white/95 p-5 shadow-[0_18px_60px_rgb(10_10_10_/_0.08)] dark:border-zinc-800 dark:bg-zinc-950/95 dark:shadow-[0_22px_70px_rgb(0_0_0_/_0.44)]">
+                <section class="rounded-lg border border-zinc-200 bg-white/95 p-5 shadow-[0_18px_60px_rgb(10_10_10_/_0.08)] dark:border-zinc-800 dark:bg-zinc-950/95 dark:shadow-[0_22px_70px_rgb(0_0_0_/_0.44)]" aria-label="Revenue chart">
                     <div class="mb-5 flex items-start justify-between gap-3 max-sm:flex-col">
                         <div>
                             <p class="m-0 mb-2 text-xs font-extrabold uppercase tracking-normal text-zinc-500 dark:text-zinc-400">"Signal"</p>
