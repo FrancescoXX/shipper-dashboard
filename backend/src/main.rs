@@ -7,7 +7,7 @@ mod state;
 use anyhow::Context;
 use db::pool::create_pool;
 use state::AppState;
-use std::env;
+use std::{env, net::SocketAddr};
 use tokio::net::TcpListener;
 
 #[tokio::main]
@@ -30,7 +30,11 @@ async fn main() -> anyhow::Result<()> {
 
     let listener = TcpListener::bind(&bind_addr).await?;
     tracing::info!("backend listening on {bind_addr}");
-    axum::serve(listener, router).await?;
+    axum::serve(
+        listener,
+        router.into_make_service_with_connect_info::<SocketAddr>(),
+    )
+    .await?;
 
     Ok(())
 }
