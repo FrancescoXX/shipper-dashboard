@@ -10,3 +10,10 @@ button,
 a {
   font: inherit;
 }
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #e01d1d;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
