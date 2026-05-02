@@ -4,6 +4,9 @@ mod handlers;
 mod routes;
 mod state;
 
+#[cfg(test)]
+mod tests;
+
 use anyhow::Context;
 use db::pool::create_pool;
 use state::AppState;
