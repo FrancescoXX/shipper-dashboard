@@ -1,0 +1,14 @@
+[package]
+name = "frontend"
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+console_error_panic_hook.workspace = true
+leptos.workspace = true
+reqwasm.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+shared.workspace = true
+wasm-bindgen-futures.workspace = true

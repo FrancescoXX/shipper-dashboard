@@ -1,0 +1,5 @@
+target/
+frontend/dist/
+.env
+.git/
+.gitignore

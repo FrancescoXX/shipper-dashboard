@@ -1,0 +1,7 @@
+/target/
+/frontend/dist/
+.env
+
+# Local editor and OS files
+.DS_Store
+*.swp
