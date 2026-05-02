@@ -1,5 +1,5 @@
 use crate::{
-    api::client::{fetch_revenue, fetch_stats},
+    api::client::{fetch_members, fetch_revenue, fetch_stats},
     components::{simple_chart::SimpleChart, stat_card::StatCard},
 };
 use leptos::*;
@@ -9,6 +9,7 @@ pub fn DashboardPage() -> impl IntoView {
     let stats = create_resource(|| (), |_| async { fetch_stats().await });
     let revenue = create_resource(|| (), |_| async { fetch_revenue().await });
     let (dark_mode, set_dark_mode) = create_signal(true);
+    let members = create_resource(|| (), |_| async { fetch_members().await });
 
     view! {
         <style>{include_str!("../styles.css")}</style>
@@ -125,6 +126,63 @@ pub fn DashboardPage() -> impl IntoView {
                         {move || {
                             revenue.get().map(|result| match result {
                                 Ok(points) => view! { <SimpleChart points=points /> }.into_view(),
+                                Err(error) => view! { <p class="text-red-600">{error}</p> }.into_view(),
+                            })
+                        }}
+                    </Suspense>
+                </section>
+
+                <section class="mt-3.5 rounded-lg border border-zinc-200 bg-white/95 p-5 shadow-[0_18px_60px_rgb(10_10_10_/_0.08)] dark:border-zinc-800 dark:bg-zinc-950/95 dark:shadow-[0_22px_70px_rgb(0_0_0_/_0.44)]">
+                    <div class="mb-5 flex items-start justify-between gap-3 max-sm:flex-col">
+                        <div>
+                            <p class="m-0 mb-2 text-xs font-extrabold uppercase tracking-normal text-zinc-500 dark:text-zinc-400">"Community"</p>
+                            <h2 class="m-0 text-[1.15rem] font-black tracking-normal">"Members"</h2>
+                        </div>
+                    </div>
+                    <Suspense fallback=move || view! { <p class="text-zinc-500 dark:text-zinc-400">"Loading members..."</p> }>
+                        {move || {
+                            members.get().map(|result| match result {
+                                Ok(members) => {
+                                    if members.is_empty() {
+                                        view! { <p class="text-zinc-500 dark:text-zinc-400">"No members yet."</p> }.into_view()
+                                    } else {
+                                        view! {
+                                            <div class="overflow-x-auto">
+                                                <table class="w-full text-left text-[0.88rem]">
+                                                    <thead>
+                                                        <tr class="border-b border-zinc-200 dark:border-zinc-800">
+                                                            <th class="pb-3 pr-4 text-[0.78rem] font-extrabold uppercase text-zinc-500 dark:text-zinc-400">"Name"</th>
+                                                            <th class="pb-3 pr-4 text-[0.78rem] font-extrabold uppercase text-zinc-500 dark:text-zinc-400">"Tier"</th>
+                                                            <th class="pb-3 text-[0.78rem] font-extrabold uppercase text-zinc-500 dark:text-zinc-400">"Joined"</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {members.into_iter().map(|m| {
+                                                            let avatar = m.avatar_url.clone().unwrap_or_default();
+                                                            let has_avatar = !avatar.is_empty();
+                                                            view! {
+                                                                <tr class="border-b border-zinc-100 dark:border-zinc-800/50">
+                                                                    <td class="flex items-center gap-2.5 py-3 pr-4 font-bold">
+                                                                        {if has_avatar {
+                                                                            view! { <img class="h-7 w-7 rounded-full object-cover" src=avatar alt="" /> }.into_view()
+                                                                        } else {
+                                                                            view! { <span class="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-200 text-[0.7rem] font-bold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">{m.name.chars().next().unwrap_or('?').to_string()}</span> }.into_view()
+                                                                        }}
+                                                                        {m.name}
+                                                                    </td>
+                                                                    <td class="py-3 pr-4">
+                                                                        <span class="rounded-full bg-zinc-100 px-2.5 py-1 text-[0.78rem] font-bold dark:bg-zinc-800">{m.tier}</span>
+                                                                    </td>
+                                                                    <td class="py-3 text-zinc-500 dark:text-zinc-400">{m.joined_at}</td>
+                                                                </tr>
+                                                            }
+                                                        }).collect_view()}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        }.into_view()
+                                    }
+                                },
                                 Err(error) => view! { <p class="text-red-600">{error}</p> }.into_view(),
                             })
                         }}

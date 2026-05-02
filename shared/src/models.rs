@@ -15,3 +15,11 @@ pub struct RevenuePoint {
     pub date: NaiveDate,
     pub revenue_cents: i64,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct Member {
+    pub name: String,
+    pub avatar_url: Option<String>,
+    pub tier: String,
+    pub joined_at: String,
+}
