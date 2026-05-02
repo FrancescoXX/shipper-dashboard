@@ -18,7 +18,7 @@ reqwasm = "0.5"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 shared = { path = "shared" }
-sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "chrono"] }
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "chrono", "migrate"] }
 thiserror = "1"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 tower-http = { version = "0.5", features = ["cors", "trace"] }

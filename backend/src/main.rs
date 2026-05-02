@@ -25,6 +25,13 @@ async fn main() -> anyhow::Result<()> {
     let bind_addr = env::var("BIND_ADDR").unwrap_or_else(|_| "0.0.0.0:3000".to_string());
 
     let pool = create_pool(&database_url).await?;
+
+    sqlx::migrate!("../migrations")
+        .run(&pool)
+        .await
+        .context("failed to run database migrations")?;
+    tracing::info!("migrations applied successfully");
+
     let state = AppState { pool };
     let router = app::router(state);
 
