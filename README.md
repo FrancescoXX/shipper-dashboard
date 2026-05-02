@@ -1,5 +1,8 @@
 # Shipper Club Dashboard MVP
 
+<img width="1522" height="1184" alt="image" src="https://github.com/user-attachments/assets/1e50a511-94b2-4013-9531-ca747f23038d" />
+
+
 Minimal Rust full-stack dashboard for Shipper Club.
 
 ## Stack
