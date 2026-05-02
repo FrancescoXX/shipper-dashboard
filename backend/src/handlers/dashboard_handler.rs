@@ -1,6 +1,6 @@
 use crate::state::AppState;
 use axum::{extract::State, http::StatusCode, Json};
-use shared::{DashboardStats, RevenuePoint};
+use shared::{DashboardStats, Member, RevenuePoint};
 use sqlx::Row;
 
 pub async fn stats(
@@ -55,6 +55,36 @@ pub async fn revenue(
         .collect();
 
     Ok(Json(points))
+}
+
+pub async fn members(
+    State(state): State<AppState>,
+) -> Result<Json<Vec<Member>>, (StatusCode, String)> {
+    let rows = sqlx::query(
+        r#"
+        SELECT name, avatar_url, tier, joined_at
+        FROM members
+        ORDER BY joined_at DESC
+        "#,
+    )
+    .fetch_all(&state.pool)
+    .await
+    .map_err(internal_error)?;
+
+    let members = rows
+        .into_iter()
+        .map(|row| {
+            let joined_at: chrono::DateTime<chrono::Utc> = row.get("joined_at");
+            Member {
+                name: row.get("name"),
+                avatar_url: row.get("avatar_url"),
+                tier: row.get("tier"),
+                joined_at: joined_at.format("%b %-d, %Y").to_string(),
+            }
+        })
+        .collect();
+
+    Ok(Json(members))
 }
 
 fn internal_error(error: sqlx::Error) -> (StatusCode, String) {

@@ -1,5 +1,5 @@
 use reqwasm::http::Request;
-use shared::{DashboardStats, RevenuePoint};
+use shared::{DashboardStats, Member, RevenuePoint};
 
 const API_BASE: &str = "/api";
 
@@ -9,6 +9,10 @@ pub async fn fetch_stats() -> Result<DashboardStats, String> {
 
 pub async fn fetch_revenue() -> Result<Vec<RevenuePoint>, String> {
     fetch_json(&format!("{API_BASE}/dashboard/revenue")).await
+}
+
+pub async fn fetch_members() -> Result<Vec<Member>, String> {
+    fetch_json(&format!("{API_BASE}/dashboard/members")).await
 }
 
 async fn fetch_json<T>(url: &str) -> Result<T, String>
