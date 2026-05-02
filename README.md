@@ -1,9 +1,8 @@
 # Shipper Club Dashboard MVP
 
-<img width="1522" height="1184" alt="image" src="https://github.com/user-attachments/assets/1e50a511-94b2-4013-9531-ca747f23038d" />
-
-
 Minimal Rust full-stack dashboard for Shipper Club.
+
+<img width="1522" height="1184" alt="image" src="https://github.com/user-attachments/assets/1e50a511-94b2-4013-9531-ca747f23038d" />
 
 ## Stack
 
@@ -13,6 +12,9 @@ Minimal Rust full-stack dashboard for Shipper Club.
 - Database: PostgreSQL
 - Database access: SQLx
 - Local infrastructure: Docker Compose
+
+<img width="1448" height="1086" alt="image" src="https://github.com/user-attachments/assets/85ca6e6d-b19b-4b2f-adc3-4087df3ca6e0" />
+
 
 ## Project Layout
 
